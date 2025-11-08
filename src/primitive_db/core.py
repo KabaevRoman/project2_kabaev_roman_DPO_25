@@ -10,9 +10,11 @@ class Column(NamedTuple):
     type: ColumnType
 
 
-class Metadata(TypedDict):
-    name: str
-    columns: set[Column]
+class Table(TypedDict):
+    columns: dict[str, ColumnType]
+
+
+Metadata = dict[str, Table]
 
 
 def parse_cols(cols: set[str]) -> set[Column]:
@@ -26,9 +28,14 @@ def parse_cols(cols: set[str]) -> set[Column]:
 
 
 def create_table(metadata: Metadata, table_name: str, columns: set[str]) -> dict:
-    if metadata.get("name") is not None:
+    if metadata.get(table_name) is not None:
         raise TableExistsException
 
     columns.add("ID:int")
     parsed_cols = parse_cols(columns)
-    metadata["columns"] = parsed_cols
+    metadata[] = parsed_cols
+
+    return metadata
+
+
+# def drop_table(metadata: Metadata)
