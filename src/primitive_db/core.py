@@ -1,8 +1,12 @@
 from typing import NamedTuple, TypedDict
 
-from primitive_db import constants
-from primitive_db.exceptions import InvalidTypeException, TableExistsException
-from primitive_db.types import ColumnType
+from src.primitive_db import constants
+from src.primitive_db.exceptions import (
+    InvalidTypeException,
+    TableExistsException,
+    TableMissingException,
+)
+from src.primitive_db.types import ColumnType
 
 
 class Column(NamedTuple):
@@ -17,23 +21,32 @@ class Table(TypedDict):
 Metadata = dict[str, Table]
 
 
-def parse_cols(cols: set[str]) -> set[Column]:
-    parsed_cols = set()
+def parse_cols(*cols: str) -> dict[str, ColumnType]:
+    parsed_columns = {}
     for col in cols:
         col_name, col_type = col.split(":")
         if col_type not in constants.VALID_TYPES:
             raise InvalidTypeException
-        parsed_cols.add(Column(col_name, col_type))
-    return parsed_cols
+        parsed_columns[col_name] = col_type
+    return parsed_columns
 
 
-def create_table(metadata: Metadata, table_name: str, columns: set[str]) -> dict:
+def create_table(metadata: Metadata, table_name: str, *columns: str) -> Metadata:
     if metadata.get(table_name) is not None:
         raise TableExistsException
 
-    columns.add("ID:int")
-    parsed_cols = parse_cols(columns)
-    metadata[] = parsed_cols
+    parsed_cols = parse_cols("ID:int", *columns)
+    metadata[table_name] = {"columns": parsed_cols}
+
+    return metadata
+
+
+def drop_table(metadata: Metadata, table_name: str) -> Metadata:
+    table = metadata.get(table_name)
+    if table is None:
+        raise TableMissingException
+
+    metadata.pop(table_name)
 
     return metadata
 
