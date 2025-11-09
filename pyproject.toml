@@ -5,7 +5,7 @@ description = ""
 authors = [{ name = "Roman Kabaev" }]
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = ["prompt (>=0.4.1,<0.5.0)"]
+dependencies = ["prompt (>=0.4.1,<0.5.0)", "prettytable (>=3.0.0,<4.0.0)"]
 
 
 [tool.poetry]
@@ -13,6 +13,7 @@ packages = [{ include = "src" }]
 
 [tool.poetry.scripts]
 project = "src.primitive_db.main:main"
+database = "src.primitive_db.main:main"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
